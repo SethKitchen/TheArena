@@ -1,9 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace TheArena
 {
+
+    public class RunGameInfo
+    {
+        public IPAddress ClientRunningGame { get; set; }
+        public Game GameRan { get; set; }
+        public long StartTimeTicks { get; set; }
+    }
+
     public class Game
     {
         public List<Player> Competitors;
@@ -11,7 +20,7 @@ namespace TheArena
         public bool IsComplete { get; set; }
         public int RoundNumber;
         public string Game_URL;
-        
+
         public Game()
         {
             Competitors = new List<Player>();
@@ -35,7 +44,7 @@ namespace TheArena
             Game_URL = url;
             if (Competitors.Count > 0)
             {
-                Competitors[0].ParentNode.Info.TeamName=name;
+                Competitors[0].ParentNode.Info.TeamName = name;
             }
             champion.Traverse(t.GetGames);
         }

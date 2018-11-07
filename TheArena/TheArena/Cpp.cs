@@ -11,133 +11,22 @@ namespace TheArena
 {
     static class Cpp
     {
-        static bool IsCommandLineCpp = true;
-
+        /// <summary>
+        /// Installs G++ and Cmake on Ubuntu needed to run the C++ Joueur Client
+        /// Install for Debian is different, so is not used in current branch
+        /// </summary>
+        /// <returns></returns>
         public static bool InstallCpp()
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-            if(isWindows)
+            if (isWindows)
             {
                 Log.TraceMessage(Log.Nav.NavIn, "Is Windows Machine...", Log.LogType.Info);
                 Log.TraceMessage(Log.Nav.NavIn, "Starting commandline in the background...", Log.LogType.Info);
-                using (Process cmdProcess = new Process())
-                {
-                    cmdProcess.StartInfo.FileName = "cmd.exe";
-                    cmdProcess.StartInfo.UseShellExecute = false;
-                    cmdProcess.StartInfo.CreateNoWindow = true;
-                    cmdProcess.StartInfo.RedirectStandardOutput = true;
-                    cmdProcess.StartInfo.RedirectStandardInput = true;
-                    cmdProcess.StartInfo.RedirectStandardError = true;
-                    cmdProcess.Start();
-                    Log.TraceMessage(Log.Nav.NavIn, "Prints Microsoft version and cmd line intro info", Log.LogType.Info);
-                    for (int i=0; i<3; i++)
-                    {
-                        Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-                    }
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Check if g++ installed...", Log.LogType.Info);
-                    cmdProcess.StandardInput.AutoFlush = true;
-                    cmdProcess.StandardInput.WriteLine("g++ -v");
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Shows command in use...", Log.LogType.Info);
-                    Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-
-                    Log.TraceMessage(Log.Nav.NavIn, "If g++ is not installed there will be an error...", Log.LogType.Info);
-                    string err = cmdProcess.StandardError.ReadLine();
-                    err += cmdProcess.StandardError.ReadLine();
-                    Console.WriteLine(err);
-                    Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-                    if(err.Contains("not recognized"))
-                    {
-                        Log.TraceMessage(Log.Nav.NavIn, "Not Recognized...", Log.LogType.Info);
-                        IsCommandLineCpp = false;
-                        //see if we already installed -
-
-                        Log.TraceMessage(Log.Nav.NavIn, "Check if cygwin32 g++ is installed...", Log.LogType.Info);
-                        cmdProcess.StandardInput.AutoFlush = true;
-                        cmdProcess.StandardInput.WriteLine(@"C:\cygnus\cygwin-b20\H-i586-cygwin32\bin\g++ -v");
-
-                        //Shows command in use
-                        Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-
-                        //Shows command in use
-                        Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-
-                        //If g++ is not installed there will be an error
-                        err = cmdProcess.StandardError.ReadLine();
-
-                        //If g++ is not installed there will be an error
-                        err = cmdProcess.StandardError.ReadLine();
-                        Console.WriteLine(err);
-                        if (err.Contains("not recognized"))
-                        {
-                            Log.TraceMessage(Log.Nav.NavIn, "Not Recognized Either...", Log.LogType.Info);
-                            //No we didn't install yet.
-                            //We will install
-                            if (IntPtr.Size == 4)
-                            {
-                                Log.TraceMessage(Log.Nav.NavIn, "32 bit machine...", Log.LogType.Info);
-                                // 32-bit
-                                ProcessStartInfo psi = new ProcessStartInfo();
-                                psi.Verb = "runas";
-                                psi.Arguments = "/s /v /qn /min";
-                                psi.CreateNoWindow = true;
-                                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                                psi.FileName = "StandaloneInstallersWindows32/full.exe";
-                                psi.UseShellExecute = false;
-                                Log.TraceMessage(Log.Nav.NavIn, "Running 32 bit installer...", Log.LogType.Info);
-                                Process p = Process.Start(psi);
-                                psi = new ProcessStartInfo();
-                                psi.Verb = "runas";
-                                psi.Arguments = "/s /v /qn /min";
-                                psi.CreateNoWindow = true;
-                                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                                psi.FileName = "StandaloneInstallersWindows32/cmake.exe";
-                                psi.UseShellExecute = false;
-                                Log.TraceMessage(Log.Nav.NavIn, "Running 32 bit installer...", Log.LogType.Info);
-                                p = Process.Start(psi);
-                            }
-                            else if (IntPtr.Size == 8)
-                            {
-                                Log.TraceMessage(Log.Nav.NavIn, "64 bit machine...", Log.LogType.Info);
-                                // 64-bit
-                                ProcessStartInfo psi = new ProcessStartInfo();
-                                psi.Verb = "runas";
-                                psi.Arguments = "/s /v /qn /min";
-                                psi.CreateNoWindow = true;
-                                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                                psi.FileName = "StandaloneInstallersWindows64/full.exe";
-                                psi.UseShellExecute = false;
-                                Log.TraceMessage(Log.Nav.NavIn, "Running 64 bit installer...", Log.LogType.Info);
-                                Process p = Process.Start(psi);
-                                psi = new ProcessStartInfo();
-                                psi.Verb = "runas";
-                                psi.Arguments = "/s /v /qn /min";
-                                psi.CreateNoWindow = true;
-                                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                                psi.FileName = "StandaloneInstallersWindows64/cmake.exe";
-                                psi.UseShellExecute = false;
-                                Log.TraceMessage(Log.Nav.NavIn, "Running 64 bit installer...", Log.LogType.Info);
-                                p = Process.Start(psi);
-                            }
-                            Log.TraceMessage(Log.Nav.NavIn, "Adding csc to path...", Log.LogType.Info);
-                            const string name = "PATH";
-                            string pathvar = System.Environment.GetEnvironmentVariable(name);
-                            var value = pathvar + @";C:\cygnus\cygwin-b20\H-i586-cygwin32\bin";
-                            var target = EnvironmentVariableTarget.User;
-                            System.Environment.SetEnvironmentVariable(name, value, target);
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        // Installed
-                        Log.TraceMessage(Log.Nav.NavOut, "Already Installed.", Log.LogType.Info);
-                    }
-                }
+                // Unimplemented
             }
-            else if(isLinux)
+            else if (isLinux)
             {
                 Log.TraceMessage(Log.Nav.NavIn, "Is Linux Machine.", Log.LogType.Info);
                 using (Process process = new Process())
@@ -160,6 +49,11 @@ namespace TheArena
             return false;
         }
 
+        /// <summary>
+        /// Given the file path, compile the AI and run it using C++ -- run until the results file shows a win, loss, or error
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static string BuildAndRun(string file)
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -168,42 +62,7 @@ namespace TheArena
             {
                 Log.TraceMessage(Log.Nav.NavIn, "Is Windows...", Log.LogType.Info);
                 Log.TraceMessage(Log.Nav.NavIn, "Starting Background Process...", Log.LogType.Info);
-                //Start commandline in the background
-                using (Process cmdProcess = new Process())
-                {
-                    cmdProcess.StartInfo.FileName = "cmd.exe";
-                    cmdProcess.StartInfo.UseShellExecute = false;
-                    cmdProcess.StartInfo.CreateNoWindow = true;
-                    cmdProcess.StartInfo.RedirectStandardOutput = true;
-                    cmdProcess.StartInfo.RedirectStandardInput = true;
-                    cmdProcess.StartInfo.RedirectStandardError = true;
-                    cmdProcess.Start();
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Printing Microsoft Information...", Log.LogType.Info);
-                    for (int i = 0; i < 3; i++)
-                    {
-                        Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-                    }
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Building file...", Log.LogType.Info);
-                    cmdProcess.StandardInput.AutoFlush = true;
-                    cmdProcess.StandardInput.WriteLine("make " + file);
-
-                    //Shows command in use
-                    Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-
-                    string result = cmdProcess.StandardOutput.ReadLine();
-
-                    while (result.Length > 0 && !result.ToUpper().Contains("I WON") && !result.ToUpper().Contains("I LOST") && !result.ToUpper().Contains("ERROR"))
-                    {
-                        Console.WriteLine(result);
-                        result = cmdProcess.StandardOutput.ReadLine();
-                    }
-                    return result;
-                    string err = cmdProcess.StandardError.ReadLine();
-                    err += cmdProcess.StandardError.ReadLine();
-                    Console.WriteLine(err);
-                }
+                //Unimplemented
             }
             else if (isLinux)
             {
@@ -220,12 +79,12 @@ namespace TheArena
                     if (process.Start())
                     {
                         process.StandardInput.WriteLine("cd " + file.Substring(0, file.LastIndexOf('/')));
-                            
-                        if (File.Exists(file.Substring(0, file.LastIndexOf('/')+1)+"testRun"))
+
+                        if (File.Exists(file.Substring(0, file.LastIndexOf('/') + 1) + "testRun"))
                         {
-                            File.Delete(file.Substring(0, file.LastIndexOf('/')+1)+"testRun");
+                            File.Delete(file.Substring(0, file.LastIndexOf('/') + 1) + "testRun");
                         }
-                        using (StreamWriter sw = new StreamWriter(file.Substring(0, file.LastIndexOf('/')+1)+"testRun"))
+                        using (StreamWriter sw = new StreamWriter(file.Substring(0, file.LastIndexOf('/') + 1) + "testRun"))
                         {
                             sw.AutoFlush = true;
                             sw.WriteLine("#!/bin/bash");
@@ -243,8 +102,8 @@ namespace TheArena
                         {
                             Log.TraceMessage(Log.Nav.NavIn, "Results file not done waiting 1 min...", Log.LogType.Info);
                             Thread.Sleep(1000 * 60); //Wait 1 min for game to finish
-                            string resultsFile = file.Substring(0, file.LastIndexOf('/')+1) + "results.txt";
-                            Log.TraceMessage(Log.Nav.NavIn, "Results File="+resultsFile, Log.LogType.Info);
+                            string resultsFile = file.Substring(0, file.LastIndexOf('/') + 1) + "results.txt";
+                            Log.TraceMessage(Log.Nav.NavIn, "Results File=" + resultsFile, Log.LogType.Info);
                             if (File.Exists(resultsFile))
                             {
                                 Log.TraceMessage(Log.Nav.NavIn, "Results file exists reading...", Log.LogType.Info);

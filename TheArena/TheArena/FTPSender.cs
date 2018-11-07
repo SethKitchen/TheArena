@@ -19,7 +19,7 @@ namespace TheArena
             string WEB_SERVER_ZIP_FILE_IP = "127.0.0.1";        // This will not normally be the same as ARENA_HOST_IP - it will be where the web server is sending the zip file from.
             foreach (var x in myIP)
             {
-                if(x.ToString().Split('.').Length==4)
+                if (x.ToString().Split('.').Length == 4)
                 {
                     WEB_SERVER_ZIP_FILE_IP = x.ToString();
                 }
@@ -58,7 +58,7 @@ namespace TheArena
                                 System.Threading.Thread.Sleep(10);                 //Wait for Processing
                                 Console.WriteLine("Response: " + sr.ReadLine());    //Read response contact from arena.
                                 Console.WriteLine("Sending EPRT- Will Listen on port 300");
-                                sw.WriteLine("EPRT |1|"+ WEB_SERVER_ZIP_FILE_IP+"|300|");             //Tell arena we want to send a zip file to it. It should connect to our IP at port 300.
+                                sw.WriteLine("EPRT |1|" + WEB_SERVER_ZIP_FILE_IP + "|300|");             //Tell arena we want to send a zip file to it. It should connect to our IP at port 300.
                                 sw.Flush();                                         //Push it out of the buffer
                                 System.Threading.Thread.Sleep(10);                 //Wait for Processing
                                 Console.WriteLine("Response: " + sr.ReadLine());    //Read response contact from arena
@@ -69,7 +69,7 @@ namespace TheArena
                                 Console.WriteLine("Response: " + sr.ReadLine());    //Read response contact from arena
                                 Console.WriteLine("Sending STOR");
                                 serveZipSock.Listen(2);                             //Listen for arena to connect to our address at port 300. Allow 2 connections.
-                                sw.WriteLine("STOR " + ZIP_FILE_NAME.Substring(ZIP_FILE_NAME.LastIndexOf('/')+1));              //Tell arena to store the incoming file as my_zip.zip
+                                sw.WriteLine("STOR " + ZIP_FILE_NAME.Substring(ZIP_FILE_NAME.LastIndexOf('/') + 1));              //Tell arena to store the incoming file as my_zip.zip
                                 sw.Flush();
                                 Socket newClient = serveZipSock.Accept();           //Accept the Arena's request to communicate on port 300 and save the endpoint.
                                 IPEndPoint newClientIP = (IPEndPoint)newClient.RemoteEndPoint;

@@ -11,7 +11,11 @@ namespace TheArena
 {
     public static class Lua
     {
-        public const string LUA_PATH = @"C:\Users\sjkyv5\Documents\5.1\";
+        /// <summary>
+        /// Installs LuaJit, LuaRocks, and LuaSocket on Ubuntu needed to run the Lua Joueur Client
+        /// Install for Debian is different, so is not used in current branch
+        /// </summary>
+        /// <returns></returns>
         public static bool InstallLua()
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -19,89 +23,7 @@ namespace TheArena
             if (isWindows)
             {
                 Log.TraceMessage(Log.Nav.NavIn, "Is. Windows. Starting Background Process...", Log.LogType.Info);
-                //Start commandline in the background
-                using (Process cmdProcess = new Process())
-                {
-                    cmdProcess.StartInfo.FileName = "cmd.exe";
-                    cmdProcess.StartInfo.UseShellExecute = false;
-                    cmdProcess.StartInfo.CreateNoWindow = true;
-                    cmdProcess.StartInfo.RedirectStandardOutput = true;
-                    cmdProcess.StartInfo.RedirectStandardInput = true;
-                    cmdProcess.StartInfo.RedirectStandardError = true;
-                    cmdProcess.Start();
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Printing Microsoft Information...", Log.LogType.Info);
-                    for (int i = 0; i < 3; i++)
-                    {
-                        Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-                    }
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Checking if Lua installed...", Log.LogType.Info);
-                    cmdProcess.StandardInput.AutoFlush = true;
-                    cmdProcess.StandardInput.WriteLine(LUA_PATH + "luac");
-
-                    //Shows command in use
-                    Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-
-                    string result = cmdProcess.StandardOutput.ReadLine();
-
-                    if (result.Length > 0)
-                        Console.WriteLine(result);
-
-                    result = cmdProcess.StandardError.ReadLine();
-
-                    if (result.ToLower().StartsWith("luac: no"))
-                    {
-                        Log.TraceMessage(Log.Nav.NavOut, "Lua Installed.", Log.LogType.Info);
-                        return false;
-                    }
-                    else
-                    {
-                        string err = result;
-
-                        //If Lua is not installed there will be an error
-                        if (err.Contains("not recognized"))
-                        {
-                            Log.TraceMessage(Log.Nav.NavIn, "Not Recongized.", Log.LogType.Info);
-                            //see if we already installed -
-
-                            //Check if Lua installed
-                            cmdProcess.StandardInput.AutoFlush = true;
-
-                            //No we didn't install yet.
-                            //We will install
-                            if (IntPtr.Size == 4)
-                            {
-                                // 32-bit
-                                ProcessStartInfo psi = new ProcessStartInfo
-                                {
-                                    Verb = "runas",
-                                    CreateNoWindow = true,
-                                    WindowStyle = ProcessWindowStyle.Hidden,
-                                    FileName = "StandaloneInstallersWindows32/LuaForWindows_v5.1.5-52.exe",
-                                    UseShellExecute = false
-                                };
-                                Log.TraceMessage(Log.Nav.NavIn, "Installing 32 bit Lua...", Log.LogType.Info);
-                                Process p = Process.Start(psi);
-                            }
-                            else if (IntPtr.Size == 8)
-                            {
-                                // 64-bit
-                                ProcessStartInfo psi = new ProcessStartInfo
-                                {
-                                    Verb = "runas",
-                                    CreateNoWindow = true,
-                                    WindowStyle = ProcessWindowStyle.Hidden,
-                                    FileName = "StandaloneInstallersWindows64/LuaForWindows_v5.1.5-52.exe",
-                                    UseShellExecute = false
-                                };
-                                Log.TraceMessage(Log.Nav.NavIn, "Installing 64 bit Lua...", Log.LogType.Info);
-                                Process p = Process.Start(psi);
-                            }
-                            return true;
-                        }
-                    }
-                }
+                //Unimplemented
             }
             else if (isLinux)
             {
@@ -127,6 +49,11 @@ namespace TheArena
             return false;
         }
 
+        /// <summary>
+        /// Given the file path, compile the AI and run it using Lua -- run until the results file shows a win, loss, or error
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static string BuildAndRun(string file)
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -135,46 +62,7 @@ namespace TheArena
             {
                 Log.TraceMessage(Log.Nav.NavIn, "Is Windows...", Log.LogType.Info);
                 Log.TraceMessage(Log.Nav.NavIn, "Starting Background Process...", Log.LogType.Info);
-                //Start commandline in the background
-                using (Process cmdProcess = new Process())
-                {
-                    cmdProcess.StartInfo.FileName = "cmd.exe";
-                    cmdProcess.StartInfo.UseShellExecute = false;
-                    cmdProcess.StartInfo.CreateNoWindow = true;
-                    cmdProcess.StartInfo.RedirectStandardOutput = true;
-                    cmdProcess.StartInfo.RedirectStandardInput = true;
-                    cmdProcess.StartInfo.RedirectStandardError = true;
-                    cmdProcess.Start();
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Printing Microsoft Information...", Log.LogType.Info);
-                    for (int i = 0; i < 3; i++)
-                    {
-                        Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-                    }
-
-                    Log.TraceMessage(Log.Nav.NavIn, "Building file...", Log.LogType.Info);
-                    cmdProcess.StandardInput.AutoFlush = true;
-                    cmdProcess.StandardInput.WriteLine(LUA_PATH + "luac " + file);
-
-
-                    //Shows command in use
-                    Console.WriteLine(cmdProcess.StandardOutput.ReadLine());
-
-                    string result = cmdProcess.StandardOutput.ReadLine();
-
-                    while (result.Length > 0 && !result.ToUpper().Contains("WIN") && !result.ToUpper().Contains("LOSE"))
-                    {
-                        Console.WriteLine(result);
-                        result = cmdProcess.StandardOutput.ReadLine();
-                    }
-                    if (result.ToUpper().Contains("WIN"))
-                    {
-                        return "win";
-                    }
-                    string err = cmdProcess.StandardError.ReadLine();
-                    err += cmdProcess.StandardError.ReadLine();
-                    Console.WriteLine(err);
-                }
+                //Unimplemented
             }
             else if (isLinux)
             {
@@ -192,11 +80,11 @@ namespace TheArena
                     {
                         process.StandardInput.WriteLine("cd " + file.Substring(0, file.LastIndexOf('/')));
 
-                        if (File.Exists(file.Substring(0, file.LastIndexOf('/')+1) + "testRun"))
+                        if (File.Exists(file.Substring(0, file.LastIndexOf('/') + 1) + "testRun"))
                         {
-                            File.Delete(file.Substring(0, file.LastIndexOf('/')+1) + "testRun");
+                            File.Delete(file.Substring(0, file.LastIndexOf('/') + 1) + "testRun");
                         }
-                        using (StreamWriter sw = new StreamWriter(file.Substring(0, file.LastIndexOf('/')+1) + "testRun"))
+                        using (StreamWriter sw = new StreamWriter(file.Substring(0, file.LastIndexOf('/') + 1) + "testRun"))
                         {
                             sw.AutoFlush = true;
                             sw.WriteLine("#!/bin/bash");
@@ -214,7 +102,7 @@ namespace TheArena
                         {
                             Log.TraceMessage(Log.Nav.NavIn, "Results file not done waiting 1 min...", Log.LogType.Info);
                             Thread.Sleep(1000 * 60); //Wait 1 min for game to finish
-                            string resultsFile = file.Substring(0, file.LastIndexOf('/')+1) + "results.txt";
+                            string resultsFile = file.Substring(0, file.LastIndexOf('/') + 1) + "results.txt";
                             Log.TraceMessage(Log.Nav.NavIn, "Results File=" + resultsFile, Log.LogType.Info);
                             if (File.Exists(resultsFile))
                             {

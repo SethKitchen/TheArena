@@ -9,17 +9,62 @@ using System.Threading;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using Logger;
+using static TheArena.ClientConnection;
 
 namespace TheArena
 {
+    public partial class Runner
+    {
+        static void StartFTPServer(bool is_host)
+        {
+            try
+            {
+                Log.TraceMessage(Log.Nav.NavIn, "Starting FTP Server", Log.LogType.Info);
+                if (!Directory.Exists(ARENA_FILES_PATH))
+                {
+                    Log.TraceMessage(Log.Nav.NavIn, "Arena File Directory didn't exist.. creating now", Log.LogType.Info);
+                    Directory.CreateDirectory(ARENA_FILES_PATH);
+                }
+                if (is_host)
+                {
+                    Log.TraceMessage(Log.Nav.NavIn, "Starting FTP Server on Host Address", Log.LogType.Info);
+                    server = new FtpServer(IPAddress.Parse(HOST_ADDR), HOST_PORT, ARENA_FILES_PATH);
+                }
+                else
+                {
+                    Log.TraceMessage(Log.Nav.NavIn, "Starting FTP Server on Any Address", Log.LogType.Info);
+                    server = new FtpServer(IPAddress.Any, HOST_PORT, ARENA_FILES_PATH);
+                }
+                server.Start();
+                if (is_host)
+                {
+                    Log.TraceMessage(Log.Nav.NavIn, "Started -- now waiting for commands forever on this thread", Log.LogType.Info);
+                    while (true)
+                    {
+                        Console.WriteLine("Type T2 to start a tourney with 2 people per game. T3 to start a tourney with 3 people per game etc.");
+                        string command = Console.ReadLine();
+                        if (command == "T2")
+                        {
+                            StartTourney(2);
+                        }
+                    }
+                }
+            }
+            catch (Exception er)
+            {
+                Log.TraceMessage(Log.Nav.NavOut, er.StackTrace + "", Log.LogType.Error);
+            }
+        }
+
+    }
 
     public class RateLimitingStream : Stream
     {
         private Stream _baseStream;
         private System.Diagnostics.Stopwatch _watch;
-        private int _speedLimit;
+        private readonly int _speedLimit;
         private long _transmitted;
-        private double _resolution;
+        private readonly double _resolution;
 
         public RateLimitingStream(Stream baseStream, int speedLimit)
             : this(baseStream, speedLimit, 1)
@@ -127,7 +172,7 @@ namespace TheArena
 
     public class ClientConnection : IDisposable
     {
-   
+
         private class DataConnectionOperation
         {
             public Func<NetworkStream, string, string> Operation { get; set; }
@@ -225,7 +270,7 @@ namespace TheArena
 
         private TransferType _connectionType = TransferType.Ascii;
         private DataConnectionType _dataConnectionType = DataConnectionType.Active;
-        
+
 
         private string _username;
         private string _root;
@@ -237,7 +282,7 @@ namespace TheArena
         private SslStream _sslStream;
 
         private string _clientIP;
-        private string direct;
+        private readonly string direct;
 
         private List<string> _validCommands;
 
@@ -249,7 +294,7 @@ namespace TheArena
             _validCommands = new List<string>();
         }
 
-        public void timeoutToEndPassiveListener()
+        public void TimeoutToEndPassiveListener()
         {
             Log.TraceMessage(Log.Nav.NavIn, "Started Timeout to End Passive Listener", Log.LogType.Info);
             Thread.Sleep(15000);
@@ -314,7 +359,7 @@ namespace TheArena
                             case "USER":
                                 response = User(arguments);
                                 //If the QUIT Command is never reached, this will end the passiveListener after 7 seconds so the port is not blocked when we try to access it in the next transaction.
-                                Thread myThread = new Thread(new ThreadStart(timeoutToEndPassiveListener));
+                                Thread myThread = new Thread(new ThreadStart(TimeoutToEndPassiveListener));
                                 myThread.Start();
                                 break;
                             case "PASS":
@@ -1007,7 +1052,7 @@ namespace TheArena
                 _dataClient = new TcpClient(_dataEndpoint.AddressFamily);
                 Log.TraceMessage(Log.Nav.NavIn, "About to Begin Connect to " + _dataEndpoint.Address.ToString(), Log.LogType.Info);
                 _dataClient.BeginConnect(_dataEndpoint.Address, _dataEndpoint.Port, DoDataConnectionOperation, state);
-                Log.TraceMessage(Log.Nav.NavIn, "We began connected to "+_dataEndpoint.Address.ToString(), Log.LogType.Info);
+                Log.TraceMessage(Log.Nav.NavIn, "We began connected to " + _dataEndpoint.Address.ToString(), Log.LogType.Info);
             }
             else
             {
@@ -1058,11 +1103,11 @@ namespace TheArena
             Log.TraceMessage(Log.Nav.NavOut, "Store Operation Starting ", Log.LogType.Info);
             try
             {
-                Log.TraceMessage(Log.Nav.NavOut, "Writing to "+pathname, Log.LogType.Info);
+                Log.TraceMessage(Log.Nav.NavOut, "Writing to " + pathname, Log.LogType.Info);
                 using (FileStream fs = new FileStream(pathname, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
                 {
                     bytes = CopyStream(dataStream, fs);
-                    Log.TraceMessage(Log.Nav.NavOut, "Copied from stream "+bytes+" bytes.", Log.LogType.Info);
+                    Log.TraceMessage(Log.Nav.NavOut, "Copied from stream " + bytes + " bytes.", Log.LogType.Info);
                 }
             }
             catch (Exception er)
@@ -1176,7 +1221,7 @@ namespace TheArena
             private TcpListener _listener;
             private List<ClientConnection> _activeConnections;
 
-            private IPEndPoint _localEndPoint;
+            private readonly IPEndPoint _localEndPoint;
 
             public FtpServer()
                 : this(IPAddress.Parse("172.22.22.104"), 3000, "C:\\")
@@ -1189,7 +1234,7 @@ namespace TheArena
                 directory = direct;
             }
 
-            public void changeDirectory(string newDirectory)
+            public void ChangeDirectory(string newDirectory)
             {
                 directory = newDirectory;
             }

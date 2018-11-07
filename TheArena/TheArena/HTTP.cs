@@ -12,7 +12,7 @@ namespace TheArena
 {
     public class HTTP
     {
-        public static async void HTTPPost(string status, string winReason, string loseReason, string logURL, string winnerTeamName, string winnerVersion, string loserTeamName, string loserVersion)
+        public static void HTTPPost(string status, string winReason, string loseReason, string logURL, string winnerTeamName, string winnerVersion, string loserTeamName, string loserVersion)
         {
             string myJson =
                 "{" +
@@ -37,10 +37,10 @@ namespace TheArena
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJpZCI6MTAsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNTQwOTI4NTc1LCJleHAiOjE1NDEwMTQ5NzV9.-SgFrNAqsth46Rz0XgBSrC5FwFB56eYwP1SzOZj8oOk");
                     allGames.Add(Task.Run(() => client.PostAsync(
                         "https://mmai-server.dillonhess.me/games/",
-                         new StringContent(myJson, Encoding.UTF8, "application/json"))));       
+                         new StringContent(myJson, Encoding.UTF8, "application/json"))));
                     Task.WaitAll(allGames.ToArray());
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     string idk = ex.Message;
                 }

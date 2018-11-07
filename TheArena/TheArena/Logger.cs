@@ -114,7 +114,7 @@ namespace Logger
         {
             string NavSymbol;
 
-            if(iCnt==1)
+            if (iCnt == 1)
             {
                 Stream myFile = File.Create("Log.txt");
                 Trace.AutoFlush = true;
@@ -167,7 +167,7 @@ namespace Logger
 
             try
             {
-                Trace.WriteLine(type+" "+ iCnt+ Message);
+                Trace.WriteLine(type + " " + iCnt + Message);
             }
             catch (Exception e)
             {

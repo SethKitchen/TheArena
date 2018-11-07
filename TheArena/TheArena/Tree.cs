@@ -22,14 +22,14 @@ namespace TheArena
 
         public void Traverse(Action<int, T> visitor)
         {
-            this.traverse(0, visitor);
+            this.Traverse(0, visitor);
         }
 
-        protected virtual void traverse(int depth, Action<int, T> visitor)
+        protected virtual void Traverse(int depth, Action<int, T> visitor)
         {
             visitor(depth, (T)this);
             foreach (T child in this.children)
-                child.traverse(depth + 1, visitor);
+                child.Traverse(depth + 1, visitor);
         }
     }
 }

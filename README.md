@@ -6,8 +6,9 @@
        ╚═╝   ╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝
                                                                        
                  Run Sig-Game AI Battles for Multiple Languages.
-                 Developed by Seth Kitchen August-November 2018
-                                   @Missouri S&T
+                 Developed by Seth Kitchen and Tanner May
+                 August-November 2018 and January-April 2019
+                            @Missouri S&T
                  
 Currently builds and runs on Windows and Linux, but Windows functionality is only 25-40% done. Could be updated in future semesters.
 Instructions for Linux on Google Cloud are below!!!!
@@ -22,12 +23,19 @@ The client starts and continously waits for the host to send it files. When the 
 and the client will run all the AIs sent to it. After it compiles the results, it sends it to the web team for record keeping and to the host
 to update the bracket.
 
+**NEW**
+
+CALLS THE GAMESERVER API WOW
+
 # Linux
 
-1) First install git and Clone the repo
+Make sure if you are running on Google Cloud that you enable IP Forwarding, and enable all UDP/TCP connections inbound and outbound in firewall rules.
+
+1) First install git and Clone the repo:
 
     sudo apt-get install git
-    git clone https://github.com/scoobyDooIT/TheArena.git
+      
+    git clone https://github.com/siggame/TheArena.git
 
 2) Open Main.cs and Change the IPAddresses to match the host and the your own computer. If you are the host, the HOST_ADDR should be an
    internal IP (ie my internal IP listed on Google Cloud - 10 dot 128 dot 0 dot 2). If you are a client the HOST_ADDR should be the external IP address
@@ -44,6 +52,26 @@ to update the bracket.
 6 -- only for client) Install Compilers - LuaJit, LuaRocks, LuaSocket, Node, NodeGyp, Python3, g++, cmake, and java8 -- You can check out the
                       commands in Cpp.cs, Java.cs, Lua.cs, etc where originally we installed automatically, but the Ubuntu commands were not the same
                       as the Debian commands and we deprecated automatic install.
+
+recently worked install commands (use pip3.7 install ....):
+
+    sudo bash
+    curl -sL https://deb.nodesource.com/setup_11.x | bash -
+    apt-get install -y luajit luarocks nodejs g++ cmake default-jre default-jdk libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev build-essential zlib1g-dev libbz2-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev libgdbm-dev liblzma-dev tk8.5-dev lzma lzma-dev libgdbm-dev uuid-dev python3-dev python3-setuptools libffi-dev libunwind-dev maven
+    luarocks install luasocket
+    npm install -g node-gyp
+    wget https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz
+    tar -xzvf Python-3.7.3.tgz
+    cd Python-3.7.3
+    mkdir build
+    cd build
+    ../configure --enable-optimizations --with-ensurepip=install
+    make -j8
+    make altinstall
+    update-alternatives --install /usr/bin/python python /usr/local/bin/python3.7 50
+    alias pip=pip3.7
+    alias pip3=pip3.7
+    alias python3=python
                       
 7) cd to the root directory (ie /home/sjkyv5/TheArena/TheArena/TheArena) and run command
 

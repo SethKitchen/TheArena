@@ -53,7 +53,6 @@ namespace TheArena
         public int numberOfPlayers;
         public List<Client> clients = new List<Client>();
     }
-        
 
     public class Winner
     {
